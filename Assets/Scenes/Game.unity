@@ -174,7 +174,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _Container: {fileID: 2062230696}
   _CardPrefab: {fileID: 3238027173932236936, guid: eb24df3652c382c4cb88e41945b1a6d5, type: 3}
-  _TotalCards: 5
+  _Columns: 10
+  _Rows: 3
   _Spacing: 10
 --- !u!1 &401485541
 GameObject:
