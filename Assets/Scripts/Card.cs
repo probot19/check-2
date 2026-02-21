@@ -19,7 +19,7 @@ public class Card : MonoBehaviour
         _RectTransform.sizeDelta = new Vector2(width, height);
         _RectTransform.anchoredPosition = new Vector2(posX, posY);
         mState = CardState.IDLE;
-        StartCoroutine(ScaleFlip(false));
+        StartCoroutine(WaitForSec(3));
     }
 
     public int GetIndex()
@@ -30,7 +30,7 @@ public class Card : MonoBehaviour
     public void Reset()
     {
         mState = CardState.IDLE;
-        StartCoroutine(ScaleFlip(false));
+        StartCoroutine(Flip(false));
     }
 
     public void Dumped()
@@ -44,13 +44,19 @@ public class Card : MonoBehaviour
         transform.localScale = Vector3.zero;
     }
 
-
     private void Show()
     {
-        mFlipRoutine = StartCoroutine(ScaleFlip(true));
+        mFlipRoutine = StartCoroutine(Flip(true));
     }
 
-    IEnumerator ScaleFlip(bool showFront)
+    IEnumerator WaitForSec(int seconds)
+    {
+        yield return new WaitForSeconds(seconds);
+        StartCoroutine(Flip(false));
+        CardsManager._Instance.OnCardsReady();
+    }
+
+    IEnumerator Flip(bool showFront)
     {
         float duration = 0.15f;
 
@@ -79,7 +85,6 @@ public class Card : MonoBehaviour
     #region UI Callback
     public void OnClick()
     {
-        Debug.LogError("Onclick");
         if (mState == CardState.SELECTED)
             return;
         mState = CardState.SELECTED;

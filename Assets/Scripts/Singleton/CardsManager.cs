@@ -24,4 +24,16 @@ public class CardsManager : MonoBehaviour
         }
         cardClick.Invoke(card);
     }
+
+     public static Action cardsReady = null;
+
+    public void OnCardsReady()
+    {
+        if (cardsReady == null)
+        {
+            Debug.LogError("No Subscribers For Event");
+            return;
+        }
+        cardsReady.Invoke();
+    }
 }
