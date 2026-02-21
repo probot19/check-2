@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class CardsHandler : MonoBehaviour
@@ -9,6 +10,51 @@ public class CardsHandler : MonoBehaviour
     [SerializeField] private int _Rows;
     [SerializeField] private float _Spacing;
 
+    private List<Card> mCards = new List<Card>();
+    private List<Card> mSelectedCards = new List<Card>();
+    private const int CardSelectionCount = 2;
+
+    void Awake()
+    {
+        CardsManager.cardClick += OnCardClick;
+    }
+
+    void OnDestroy()
+    {
+        CardsManager.cardClick += OnCardClick;
+    }
+
+    private void OnCardClick(Card card)
+    {
+        if (mSelectedCards.Count >= CardSelectionCount)
+        {
+            Debug.LogError("OnCardClick : Somthing went worng");
+            return;
+        }
+
+        mSelectedCards.Add(card);
+
+        if (mSelectedCards.Count == CardSelectionCount)
+        {
+            if (mSelectedCards[0].GetIndex() == mSelectedCards[1].GetIndex())
+            {
+                Debug.LogError($"Cards Match Id : {mSelectedCards[0].GetIndex()}");
+                mSelectedCards[0].Dumped();
+                mSelectedCards[1].Dumped();
+            }
+            else
+            {
+                mSelectedCards[0].Reset();
+                mSelectedCards[1].Reset();
+            }
+            mSelectedCards.Clear();
+        }
+        else
+        {
+
+        }
+    }
+
     void Start()
     {
         SpawnCards();
@@ -16,6 +62,13 @@ public class CardsHandler : MonoBehaviour
 
     private void SpawnCards()
     {
+
+        if (_Columns * _Rows % 2 != 0)
+        {
+            Debug.LogError("Needs even number of cards");
+            return;
+        }
+
         float containerWidth = _Container.rect.width;
         float containerHeight = _Container.rect.height;
 
@@ -28,25 +81,56 @@ public class CardsHandler : MonoBehaviour
         float startX = -gridWidth / 2 + cardWidth / 2;
         float startY = gridHeight / 2 - cardHeight / 2;
 
+        InstantiateCards(startX, startY, cardWidth, cardHeight);
+    }
+
+    private void InstantiateCards(float startX, float startY, float cardWidth, float cardHeight)
+    {
         int cardIndex = 0;
+        List<int> pairIds = GeneratePairIDs(_Columns * _Rows);
 
         for (int row = 0; row < _Rows; row++)
         {
             for (int column = 0; column < _Columns; column++)
             {
-                if (cardIndex >= this._Columns * this._Rows)
+                if (cardIndex >= _Columns * _Rows)
                     return;
 
                 GameObject card = Instantiate(_CardPrefab, _Container);
                 Card newCard = card.GetComponent<Card>();
+                mCards.Add(newCard);
 
                 float posX = startX + column * (cardWidth + _Spacing);
                 float posY = startY - row * (cardHeight + _Spacing);
 
-                newCard.Init(cardWidth, cardHeight, posX, posY);
+                newCard.Init(pairIds[cardIndex], cardWidth, cardHeight, posX, posY);
 
                 cardIndex++;
             }
         }
     }
+
+    private List<int> GeneratePairIDs(int totalCards)
+    {
+        List<int> ids = new List<int>();
+
+        int pairCount = totalCards / 2;
+
+        for (int i = 0; i < pairCount; i++)
+        {
+            ids.Add(i);
+            ids.Add(i);
+        }
+
+        for (int i = ids.Count - 1; i > 0; i--)
+        {
+            int rand = Random.Range(0, i + 1);
+            int temp = ids[i];
+            ids[i] = ids[rand];
+            ids[rand] = temp;
+        }
+        
+        return ids;
+    }
+
 }
