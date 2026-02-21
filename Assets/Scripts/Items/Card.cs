@@ -27,10 +27,25 @@ public class Card : MonoBehaviour
         return mId;
     }
 
+    public bool IsDumped()
+    {
+        return mState == CardState.DUMPED;
+    }
+
     public void Reset()
     {
         mState = CardState.IDLE;
         StartCoroutine(Flip(false));
+    }
+
+    public void SetToIdle()
+    {
+        mState = CardState.IDLE;
+        if (_Back != null)
+            _Back.SetActive(true);
+        if (_Front != null)
+            _Front.SetActive(false);
+        transform.localScale = Vector3.one;
     }
 
     public void Dumped()
@@ -42,6 +57,28 @@ public class Card : MonoBehaviour
 
         transform.localRotation = Quaternion.identity;
         transform.localScale = Vector3.zero;
+        
+        if (_Front != null)
+            _Front.SetActive(false);
+        if (_Back != null)
+            _Back.SetActive(false);
+    }
+
+    public void RestoreAsMatched()
+    {
+        mState = CardState.DUMPED;
+        gameObject.SetActive(false);
+        
+        if (mFlipRoutine != null)
+            StopCoroutine(mFlipRoutine);
+        
+        transform.localRotation = Quaternion.identity;
+        transform.localScale = Vector3.zero;
+        
+        if (_Front != null)
+            _Front.SetActive(false);
+        if (_Back != null)
+            _Back.SetActive(false);
     }
 
     private void Show()

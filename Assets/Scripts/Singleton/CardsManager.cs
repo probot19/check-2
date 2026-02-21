@@ -17,35 +17,23 @@ public class CardsManager : MonoBehaviour
 
     public void OnCardClick(Card card)
     {
-        if (cardClick == null)
-        {
-            Debug.LogError("No Subscribers For Event");
-            return;
-        }
-        cardClick.Invoke(card);
+        if (cardClick != null)
+            cardClick.Invoke(card);
     }
 
     public static Action cardsReady = null;
 
     public void OnCardsReady()
     {
-        if (cardsReady == null)
-        {
-            Debug.LogError("No Subscribers For Event");
-            return;
-        }
-        cardsReady.Invoke();
+        if (cardsReady != null)
+            cardsReady.Invoke();
     }
 
     public static Action<int, int> startGame = null;
 
     public void OnStartGame(int x, int y)
     {
-        if (startGame == null)
-        {
-            Debug.LogError("No Subscribers For Event");
-            return;
-        }
-        startGame.Invoke(x, y);
+        if (startGame != null)
+            startGame.Invoke(x, y);
     }
 }

@@ -17,23 +17,15 @@ public class HUDManager : MonoBehaviour
 
     public void OnCardsMatched()
     {
-        if (cardsMatched == null)
-        {
-            Debug.LogError("No Subscribers For Event");
-            return;
-        }
-        cardsMatched.Invoke();
+        if (cardsMatched != null)
+            cardsMatched.Invoke();
     }
 
     public static Action turn = null;
 
     public void OnTurn()
     {
-        if (turn == null)
-        {
-            Debug.LogError("No Subscribers For Event");
-            return;
-        }
-        turn.Invoke();
+        if (turn != null)
+            turn.Invoke();
     }
 }

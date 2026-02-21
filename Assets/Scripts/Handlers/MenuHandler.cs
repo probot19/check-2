@@ -7,6 +7,7 @@ public class MenuHandler : MonoBehaviour
 {
 
     [SerializeField] private Button _StartButton;
+    [SerializeField] private Button _LoadButton;
     [SerializeField] private AudioSource _PlayAudio;
 
     private int mRowSize;
@@ -15,6 +16,7 @@ public class MenuHandler : MonoBehaviour
     void Start()
     {
         _StartButton.interactable = false;
+        _LoadButton.interactable = SaveManager._Instance != null && SaveManager._Instance.HasSaveFile();
     }
 
     public void OnInputRow(string input)
@@ -42,8 +44,23 @@ public class MenuHandler : MonoBehaviour
     public void OnPlayButtonClick()
     {
         _PlayAudio.Play();
+        SaveManager._Instance.DeleteSaveFile(); 
         CardsManager._Instance.OnStartGame(mRowSize, mColumnSize);
         StartCoroutine(DisableAfterSound());
+    }
+
+    public void OnLoadButtonClick()
+    {
+        if (SaveManager._Instance != null && SaveManager._Instance.HasSaveFile())
+        {
+            SaveData data = SaveManager._Instance.LoadGame();
+            if (data != null)
+            {
+                _PlayAudio.Play();
+                CardsManager._Instance.OnStartGame(data.gridRows, data.gridColumns);
+                StartCoroutine(DisableAfterSound());
+            }
+        }
     }
 
     IEnumerator DisableAfterSound()
@@ -52,11 +69,9 @@ public class MenuHandler : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-
-
     private void CheckGridSize()
     {
-        if (mRowSize > 0 && mColumnSize > 0 && mRowSize * mColumnSize % 2 == 0 && mRowSize * mColumnSize < 88)  // This project has 44 images for we can build only 44 x 2 cards
+        if (mRowSize > 0 && mColumnSize > 0 && mRowSize * mColumnSize % 2 == 0 && mRowSize * mColumnSize < 88)
             _StartButton.interactable = true;
     }
 }

@@ -42,7 +42,6 @@ public class HUDHandler : MonoBehaviour
         }
     }
 
-
     private void OnTurn()
     {
         mTurn++;
@@ -54,6 +53,24 @@ public class HUDHandler : MonoBehaviour
         }
 
         priviousScore = mScore;
+    }
+
+    public int GetScore()
+    {
+        return mScore;
+    }
+
+    public int GetTurns()
+    {
+        return mTurn;
+    }
+
+    public void RestoreProgress(int score, int turns)
+    {
+        mScore = score;
+        mTurn = turns;
+        _Score.text = mScore.ToString();
+        _Turns.text = mTurn.ToString();
     }
 
 }

@@ -17,12 +17,23 @@ public class CardsHandler : MonoBehaviour
     private List<Card> mSelectedCards = new List<Card>();
     private const int CardSelectionCount = 2;
     private const float _Spacing = 10;
+    private int mTotalCards = 0;
+    private int mMatchedCards = 0;
+    private int mGridRows = 0;
+    private int mGridColumns = 0;
+    private HUDHandler mHudHandler;
 
     void Awake()
     {
         CardsManager.startGame += OnStartGame;
         CardsManager.cardClick += OnCardClick;
         CardsManager.cardsReady += OnCardsReady;
+        
+        mHudHandler = GetComponentInParent<HUDHandler>();
+        if (mHudHandler == null)
+        {
+            mHudHandler = FindObjectOfType<HUDHandler>();
+        }
     }
 
     void OnDestroy()
@@ -34,6 +45,10 @@ public class CardsHandler : MonoBehaviour
 
     private void OnStartGame(int x, int y)
     {
+        mGridRows = x;
+        mGridColumns = y;
+        mTotalCards = x * y;
+        mMatchedCards = 0;
         SpawnCards(x, y);
         _ClickBlocker.SetActive(true);
     }
@@ -41,10 +56,7 @@ public class CardsHandler : MonoBehaviour
     private void OnCardClick(Card card)
     {
         if (mSelectedCards.Count >= CardSelectionCount)
-        {
-            Debug.LogError("OnCardClick : Somthing went worng");
             return;
-        }
 
         mSelectedCards.Add(card);
         _AudioSource.clip = _FlipClip;
@@ -71,11 +83,27 @@ public class CardsHandler : MonoBehaviour
         {
             mSelectedCards[0].Dumped();
             mSelectedCards[1].Dumped();
+            mMatchedCards += 2;
 
             HUDManager._Instance.OnCardsMatched();
             _AudioSource.clip = _MatchClip;
             _AudioSource.Play();
-            // check if all card are matched they won
+            
+            if (mMatchedCards >= mTotalCards)
+            {
+                yield return new WaitForSeconds(1f);
+                int finalScore = 0;
+                int finalTurns = 0;
+                
+                if (mHudHandler != null)
+                {
+                    finalScore = mHudHandler.GetScore();
+                    finalTurns = mHudHandler.GetTurns();
+                }
+                
+                GameOverManager._Instance.OnGameOver(finalScore, finalTurns, mMatchedCards / 2);
+                yield break;
+            }
         }
         else
         {
@@ -92,10 +120,7 @@ public class CardsHandler : MonoBehaviour
     private void SpawnCards(int _Rows, int _Columns)
     {
         if (_Columns * _Rows % 2 != 0)
-        {
-            Debug.LogError("Needs even number of cards");
             return;
-        }
 
         float containerWidth = _Container.rect.width;
         float containerHeight = _Container.rect.height;
@@ -159,6 +184,50 @@ public class CardsHandler : MonoBehaviour
         }
 
         return ids;
+    }
+
+    public SavedCardState[] GetCardStates()
+    {
+        SavedCardState[] states = new SavedCardState[mCards.Count];
+        for (int i = 0; i < mCards.Count; i++)
+        {
+            states[i] = new SavedCardState(mCards[i].GetIndex(), mCards[i].IsDumped());
+        }
+        return states;
+    }
+
+    public void GetGridDimensions(out int rows, out int columns)
+    {
+        rows = mGridRows;
+        columns = mGridColumns;
+    }
+
+    public void RestoreFromSave(SaveData saveData)
+    {
+        if (saveData == null)
+            return;
+
+        SavedCardState[] cardStates = saveData.GetCardStates();
+        if (cardStates == null || cardStates.Length == 0)
+            return;
+
+        mMatchedCards = 0;
+        
+        for (int i = 0; i < mCards.Count && i < cardStates.Length; i++)
+        {
+            Card card = mCards[i];
+            SavedCardState savedState = cardStates[i];
+            
+            if (savedState.isMatched)
+            {
+                card.RestoreAsMatched();
+                mMatchedCards += 1;
+            }
+            else
+            {
+                card.SetToIdle();
+            }
+        }
     }
 
 }
