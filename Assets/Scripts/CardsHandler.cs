@@ -21,7 +21,7 @@ public class CardsHandler : MonoBehaviour
 
     void OnDestroy()
     {
-        CardsManager.cardClick += OnCardClick;
+        CardsManager.cardClick -= OnCardClick;
     }
 
     private void OnCardClick(Card card)
@@ -41,6 +41,7 @@ public class CardsHandler : MonoBehaviour
                 Debug.LogError($"Cards Match Id : {mSelectedCards[0].GetIndex()}");
                 mSelectedCards[0].Dumped();
                 mSelectedCards[1].Dumped();
+                HUDManager._Instance.OnCardsMatched();
             }
             else
             {
@@ -48,6 +49,7 @@ public class CardsHandler : MonoBehaviour
                 mSelectedCards[1].Reset();
             }
             mSelectedCards.Clear();
+            HUDManager._Instance.OnTurn();
         }
         else
         {
@@ -129,7 +131,7 @@ public class CardsHandler : MonoBehaviour
             ids[i] = ids[rand];
             ids[rand] = temp;
         }
-        
+
         return ids;
     }
 
