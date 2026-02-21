@@ -9,6 +9,9 @@ public class CardsHandler : MonoBehaviour
     [SerializeField] private GameObject _ClickBlocker;
     [SerializeField] private RectTransform _Container;
     [SerializeField] private SpriteConfig _SpriteConfig;
+    [SerializeField] private AudioSource _AudioSource;
+    [SerializeField] private AudioClip _MatchClip;
+    [SerializeField] private AudioClip _FlipClip;
 
     private List<Card> mCards = new List<Card>();
     private List<Card> mSelectedCards = new List<Card>();
@@ -44,6 +47,8 @@ public class CardsHandler : MonoBehaviour
         }
 
         mSelectedCards.Add(card);
+        _AudioSource.clip = _FlipClip;
+        _AudioSource.Play();
 
         if (mSelectedCards.Count == CardSelectionCount)
         {
@@ -59,6 +64,7 @@ public class CardsHandler : MonoBehaviour
     IEnumerator ResolveSelection()
     {
         _ClickBlocker.SetActive(true);
+
         yield return new WaitForSeconds(0.7f);
 
         if (mSelectedCards[0].GetIndex() == mSelectedCards[1].GetIndex())
@@ -67,6 +73,9 @@ public class CardsHandler : MonoBehaviour
             mSelectedCards[1].Dumped();
 
             HUDManager._Instance.OnCardsMatched();
+            _AudioSource.clip = _MatchClip;
+            _AudioSource.Play();
+            // check if all card are matched they won
         }
         else
         {
