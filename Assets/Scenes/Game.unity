@@ -174,8 +174,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _Container: {fileID: 2062230696}
   _CardPrefab: {fileID: 3238027173932236936, guid: eb24df3652c382c4cb88e41945b1a6d5, type: 3}
-  _Columns: 10
-  _Rows: 3
+  _SpriteConfig: {fileID: 11400000, guid: cbb6ea4b0e7279e4bb271284588061de, type: 2}
+  _Columns: 4
+  _Rows: 4
   _Spacing: 10
 --- !u!1 &128774818
 GameObject:

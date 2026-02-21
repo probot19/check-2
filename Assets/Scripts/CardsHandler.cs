@@ -6,6 +6,7 @@ public class CardsHandler : MonoBehaviour
     [Header("Values")]
     [SerializeField] private RectTransform _Container;
     [SerializeField] private GameObject _CardPrefab;
+    [SerializeField] private SpriteConfig _SpriteConfig;
     [SerializeField] private int _Columns;
     [SerializeField] private int _Rows;
     [SerializeField] private float _Spacing;
@@ -104,8 +105,8 @@ public class CardsHandler : MonoBehaviour
 
                 float posX = startX + column * (cardWidth + _Spacing);
                 float posY = startY - row * (cardHeight + _Spacing);
-
-                newCard.Init(pairIds[cardIndex], cardWidth, cardHeight, posX, posY);
+                Sprite sprite = _SpriteConfig.sprites[pairIds[cardIndex]];
+                newCard.Init(pairIds[cardIndex], cardWidth, cardHeight, posX, posY, sprite);
 
                 cardIndex++;
             }
