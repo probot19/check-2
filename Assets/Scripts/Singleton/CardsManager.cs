@@ -25,7 +25,7 @@ public class CardsManager : MonoBehaviour
         cardClick.Invoke(card);
     }
 
-     public static Action cardsReady = null;
+    public static Action cardsReady = null;
 
     public void OnCardsReady()
     {
@@ -35,5 +35,17 @@ public class CardsManager : MonoBehaviour
             return;
         }
         cardsReady.Invoke();
+    }
+
+    public static Action<int, int> startGame = null;
+
+    public void OnStartGame(int x, int y)
+    {
+        if (startGame == null)
+        {
+            Debug.LogError("No Subscribers For Event");
+            return;
+        }
+        startGame.Invoke(x, y);
     }
 }

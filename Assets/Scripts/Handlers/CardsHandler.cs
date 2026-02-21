@@ -9,8 +9,6 @@ public class CardsHandler : MonoBehaviour
     [SerializeField] private GameObject _ClickBlocker;
     [SerializeField] private RectTransform _Container;
     [SerializeField] private SpriteConfig _SpriteConfig;
-    [SerializeField] private int _Columns;
-    [SerializeField] private int _Rows;
 
     private List<Card> mCards = new List<Card>();
     private List<Card> mSelectedCards = new List<Card>();
@@ -19,14 +17,22 @@ public class CardsHandler : MonoBehaviour
 
     void Awake()
     {
+        CardsManager.startGame += OnStartGame;
         CardsManager.cardClick += OnCardClick;
         CardsManager.cardsReady += OnCardsReady;
     }
 
     void OnDestroy()
     {
+        CardsManager.startGame -= OnStartGame;
         CardsManager.cardClick -= OnCardClick;
         CardsManager.cardsReady -= OnCardsReady;
+    }
+
+    private void OnStartGame(int x, int y)
+    {
+        SpawnCards(x, y);
+        _ClickBlocker.SetActive(true);
     }
 
     private void OnCardClick(Card card)
@@ -74,16 +80,8 @@ public class CardsHandler : MonoBehaviour
         _ClickBlocker.SetActive(false);
     }
 
-
-    void Start()
+    private void SpawnCards(int _Rows, int _Columns)
     {
-        SpawnCards();
-        _ClickBlocker.SetActive(true);
-    }
-
-    private void SpawnCards()
-    {
-
         if (_Columns * _Rows % 2 != 0)
         {
             Debug.LogError("Needs even number of cards");
@@ -102,10 +100,10 @@ public class CardsHandler : MonoBehaviour
         float startX = -gridWidth / 2 + cardWidth / 2;
         float startY = gridHeight / 2 - cardHeight / 2;
 
-        InstantiateCards(startX, startY, cardWidth, cardHeight);
+        InstantiateCards(_Rows, _Columns, startX, startY, cardWidth, cardHeight);
     }
 
-    private void InstantiateCards(float startX, float startY, float cardWidth, float cardHeight)
+    private void InstantiateCards(int _Rows, int _Columns, float startX, float startY, float cardWidth, float cardHeight)
     {
         int cardIndex = 0;
         List<int> pairIds = GeneratePairIDs(_Columns * _Rows);
