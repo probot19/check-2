@@ -6,8 +6,10 @@ public class HUDHandler : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _Score;
     [SerializeField] private TextMeshProUGUI _Turns;
 
-    private int mScore = 0;
-    private int mTurn = 0;
+    private int mScore;
+    private int mTurn;
+    private int mComboStreak;
+    private int priviousScore;
 
     void Awake()
     {
@@ -27,15 +29,30 @@ public class HUDHandler : MonoBehaviour
         _Turns.text = mTurn.ToString();
     }
 
-    private void OnCardsMatch()
-    {
-        mScore++;
-        _Score.text = mScore.ToString();
-    }
+   private void OnCardsMatch()
+{
+    mComboStreak++;
+
+    int comboBonus = Mathf.Max(0, mComboStreak - 1);
+
+    mScore += 1 + comboBonus;
+
+    _Score.text = mScore.ToString();
+
+}
+
 
     private void OnTurn()
+{
+    mTurn++;
+    _Turns.text = mTurn.ToString();
+
+    if (priviousScore == mScore)
     {
-        mTurn++;
-        _Turns.text = mTurn.ToString();
+        mComboStreak = 0;
     }
+
+    priviousScore = mScore;
+}
+
 }
